@@ -14,9 +14,9 @@ The Mirabox uses a Marvell Armada 370 SoC ARM chip. The Armada 370 uses the ARMv
 - 1 microsd card reader (2? 1 external and 1 internal)
 - 1 Mini PCIe expansion slot
 - 3 GPIO LEDs
-- 1 GPIO button
-- 802.11b/g/n Wifi (88W8766)
-- Bluetooth 4.0 (88W8766) (older hardware revs had BT 3.0)
+- 1 button (older models this was a GPIO button, newer ones it is a hardware reset)
+- 802.11b/g/n Wifi (88W8766 or 88W8787)
+- Bluetooth 4.0 (88W8766 or 88W8787) (older hardware revs had BT 3.0)
 
 In June 2014 Marvell released detail specs for the Armada 370 SoC:
 
@@ -47,7 +47,7 @@ What works in >= 3.14 kernel?
 You will need a cross compiling toolchain to build the kernel. The easiest way to get that is by downloading the one provided by [Globalscale][3]. To actually build the kernel run the following commands:
 
     export PATH="/home/build/armv7-marvell-linux-gnueabi/bin:$PATH"
-    make ARCH=arm CROSS_COMPILE=arm-marvell-linux-gnueabi- mvebu_defconfig
+    make ARCH=arm CROSS_COMPILE=arm-marvell-linux-gnueabi- mvebu_v7_defconfig
     make ARCH=arm CROSS_COMPILE=arm-marvell-linux-gnueabi- zImage
     make ARCH=arm CROSS_COMPILE=arm-marvell-linux-gnueabi- armada-370-mirabox.dtb
     cp arch/arm/boot/zImage zImage-with-dtb
@@ -64,19 +64,24 @@ Initial work has been done to support the Mirabox in the [Barebox Bootloader][5]
 ## Building Barebox
 You will need to extract a binary blob from an existing bootloader for the mirabox. The easiest way to do this is to download the u-boot image from [Globalscale][3].
 
+    # cd into barebox root dir
     mkdir /tmp/mirabox
-    ./scripts/kwbimage -x -i ~/downloads/u-boot-db88f6710bp_nand.bin -o /tmp/mirabox
+    cd scripts
+    make kwbimage
+    ./kwbimage -x -i ~/downloads/u-boot-db88f6710bp_nand.bin -o /tmp/mirabox
 
 To build barebox:
 
+    # cd into barebox root dir
     export PATH="/home/build/armv7-marvell-linux-gnueabi/bin:$PATH"
     cp /tmp/mirabox/kwbimage.cfg kwbimage.cfg
     sed -i -e 's/nand/uart/' kwbimage.cfg
-    make ARCH=arm CROSS_COMPILE=arm-marvell-linux-gnueabi- globalscale_mirabox_defconfig
-    make ARCH=arm CROSS_COMPILE=arm-marvell-linux-gnueabi- make
+    make ARCH=arm CROSS_COMPILE=arm-marvell-linux-gnueabi- mvebu_defconfig
+    make ARCH=arm CROSS_COMPILE=arm-marvell-linux-gnueabi-
 
 To boot to barebox, run the following command:
 
+    # cd into barebox root dir
     ./scripts/kwboot -t -b barebox-flash-image  -B 115200 /dev/ttyUSB0
 
 ### What are kwbimage and kwboot?
