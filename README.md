@@ -12,17 +12,42 @@ The Mirabox uses a Marvell Armada 370 SoC ARM chip. The Armada 370 uses the ARMv
 - 2 10/100/1000 ethernet ports
 - 2 USB 3.0 host ports
 - 1 microsd card reader (2? 1 external and 1 internal)
-- 1 Mini PCIe expansion slot
+- 1 Mini PCIe expansion slot (taken by Wifi chip on latest revision)
 - 3 GPIO LEDs
 - 1 button (older models this was a GPIO button, newer ones it is a hardware reset)
 - 802.11b/g/n Wifi (88W8766 or 88W8787)
 - Bluetooth 4.0 (88W8766 or 88W8787) (older hardware revs had BT 3.0)
+
 
 In June 2014 Marvell released detail specs for the Armada 370 SoC:
 
 - Product Brief:   http://www.marvell.com/embedded-processors/armada-300/assets/Marvell_ARMADA_370_SoC.pdf
 - Hardware Spec:   http://www.marvell.com/embedded-processors/armada-300/assets/ARMADA370-datasheet.pdf
 - Functional Spec: http://www.marvell.com/embedded-processors/armada-300/assets/ARMADA370-FunctionalSpec-datasheet.pdf
+
+## Old vs new hardware
+
+There have been at least 3 hardware revisions of the Mirabox hardware. The following is based on my observations of different hardware units and is probably incomplete:
+
+### Rev1:
+
+- Metal side with "Mirabox" machined into it
+- Button on a GPIO line
+- 88W8787 combo Wifi/Bluetooth
+
+
+### Rev2
+
+- Plastic side with adhesive "Mirabox - LX" label
+- Button is hardware reset
+
+
+### Rev3
+
+- Plastic side with adhesive "Mirabox - LX" label
+- Button is hardware reset
+- 88W8766 Wifi/Bluetooth chip using the PCIe slot (the chip uses the USB bus)
+- No internal sdcard slot (the fold type); the external slot is still there
 
 
 ## Kernel
@@ -41,7 +66,7 @@ What works in >= 3.14 kernel?
 
 *Ethernet works properly, but by default the NICs will have randomly assigned mac addresses. This can be done via uBoot[10][10] if the mvneta is compiled into the kernel (not as a module). You can also read the uBoot variables for ethaddr and eth1addr using fw_printenv and set the mac addresses from an init script.
 
-**Wireless works, but you must load the mvsdio kernel module with nodma=1 option[11][11].
+**Wireless works, but for the 88W8787 chip you must load the mvsdio kernel module with nodma=1 option[11][11].
 
 ### Building a kernel
 You will need a cross compiling toolchain to build the kernel. The easiest way to get that is by downloading the one provided by [Globalscale][3]. To actually build the kernel run the following commands:
